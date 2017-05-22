@@ -87,7 +87,7 @@ ei_recv_internal (int fd,
   
   /* read enough to get at least entire header */
   bytesread = (len > EIRECVBUF ? EIRECVBUF : len); 
-  if ((i = ei_read_fill_t(fd,header,bytesread,ms)) != bytesread) {
+  if ((i = ei_read_fill_t(fd,header,bytesread,0)) != bytesread) {
       erl_errno = (i == -2) ? ETIMEDOUT : EIO;
       return -1;
   }
@@ -216,7 +216,7 @@ ei_recv_internal (int fd,
       /* flush in rest of packet */
       while (remain > 0) {
 	if (remain < sz) sz = remain;
-	if ((i=ei_read_fill_t(fd,header,sz,ms)) <= 0) break;
+	if ((i=ei_read_fill_t(fd,header,sz,0)) <= 0) break;
 	remain -= i;
       }
       erl_errno = EMSGSIZE;
@@ -247,7 +247,7 @@ ei_recv_internal (int fd,
 
   /* read the rest of the message into callers buffer */
   if (remain > 0) {
-    if ((i = ei_read_fill_t(fd,mbuf+bytesread-index,remain,ms)) != remain) {
+    if ((i = ei_read_fill_t(fd,mbuf+bytesread-index,remain,0)) != remain) {
       *msglenp = bytesread-index+1; /* actual bytes in users buffer */
       erl_errno = (i == -2) ? ETIMEDOUT : EIO;
       return -1;
